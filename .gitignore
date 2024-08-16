@@ -48,3 +48,12 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Go cache
+.cache/
+
+# Environment files
+.env
+
+# Go build output
+challenge-assignment-plugin-server-go
+cloudsave-validator
