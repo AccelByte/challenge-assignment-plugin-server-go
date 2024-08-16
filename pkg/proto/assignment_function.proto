@@ -18,25 +18,27 @@ service AssignmentFunction {
 }
 
 message AssignmentRequest {
-    string userId = 1;
-    repeated Goal goals = 2;
-    string namespace = 3;
+    string namespace = 1;
+    string userId = 2;
+    repeated Goal goals = 3;
 }
 
 message AssignmentResponse {
-    string userId = 1;
-    repeated Goal assignedGoals = 2;
+    string namespace = 1;
+    string userId = 2;
+    repeated Goal assignedGoals = 3;
 }
 
 message Goal {
-    string id = 1;
-    string code = 2;
-    string challengeCode = 3;
-    repeated Tag tags = 4;
-    repeated Requirement requirements = 5;
-    repeated Reward rewards = 6;
-    google.protobuf.Timestamp createdAt = 7;
-    google.protobuf.Timestamp updatedAt = 8;
+    string code = 1;
+    string challengeCode = 2;
+    string name = 3;
+    bool isActive = 4;
+    repeated Tag tags = 5;
+    repeated Requirement requirements = 6;
+    repeated Reward rewards = 7;
+    google.protobuf.Timestamp createdAt = 8;
+    google.protobuf.Timestamp updatedAt = 9;
 }
 
 message Requirement {
