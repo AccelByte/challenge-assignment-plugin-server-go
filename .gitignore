@@ -56,4 +56,5 @@ Thumbs.db
 
 # Go build output
 challenge-assignment-plugin-server-go
-cloudsave-validator
+
+*.out

@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-# cloudsave validator demo script
+# assignment function demo script
 
 # Requires: bash curl jq
-
 set -e
 set -o pipefail
 
@@ -16,7 +15,7 @@ if [ -z "$GRPC_SERVER_URL" ] && [ -z "$EXTEND_APP_NAME" ]; then
   exit 1
 fi
 
-DEMO_PREFIX='cloudsave_grpc_demo'
+DEMO_PREFIX='challenge_grpc_demo'
 
 api_curl()
 {
@@ -31,9 +30,9 @@ clean_up()
 
   api_curl -X DELETE "${AB_BASE_URL}/iam/v3/admin/namespaces/$AB_NAMESPACE/users/$USER_ID/information" -H "Authorization: Bearer $ACCESS_TOKEN"
 
-  echo Resetting cloudsave validator ...
+  echo Resetting challenge assignment  ...
 
-  api_curl -X DELETE -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/plugins" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' >/dev/null
+  api_curl -X DELETE -s "${AB_BASE_URL}/challenge/v1/admin/namespaces/$AB_NAMESPACE/plugins/assignment" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' >/dev/null
 }
 
 trap clean_up EXIT
@@ -48,23 +47,25 @@ if [ "$(cat api_curl_http_code.out)" -ge "400" ]; then
 fi
 
 if [ -n "$GRPC_SERVER_URL" ]; then
-  echo Registering cloudsave validator $GRPC_SERVER_URL ...
+  echo Registering challenge assignment function $GRPC_SERVER_URL ...
 
-  api_curl -X DELETE -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/plugins" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' >/dev/null
+  api_curl -X DELETE -s "${AB_BASE_URL}/challenge/v1/admin/namespaces/$AB_NAMESPACE/plugins/assignment" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' >/dev/null
 
-  api_curl -X POST -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/plugins" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d "{\"customConfig\":{\"GRPCAddress\":\"${GRPC_SERVER_URL}\"},\"customFunction\":{\"afterReadGameRecord\":true,\"beforeWritePlayerRecord\":true},\"extendType\":\"CUSTOM\"}" >/dev/null
+  api_curl -X POST -s "${AB_BASE_URL}/challenge/v1/admin/namespaces/$AB_NAMESPACE/plugins/assignment" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d "{\"extendType\": \"CUSTOM\",\"grpcServerAddress\": \"${GRPC_SERVER_URL}\"}" >/dev/null
 
   if [ "$(cat api_curl_http_code.out)" -ge "400" ]; then
+    cat api_curl_http_response.out
     exit 1
   fi
 elif [ -n "$EXTEND_APP_NAME" ]; then
-  echo Registering cloudsave validator $EXTEND_APP_NAME ...
+  echo Registering challenge assignment function $EXTEND_APP_NAME ...
 
-  api_curl -X DELETE -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/plugins" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' >/dev/null
+  api_curl -X DELETE -s "${AB_BASE_URL}/challenge/v1/admin/namespaces/$AB_NAMESPACE/plugins/assignment" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' >/dev/null
 
-  api_curl -X POST -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/plugins" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d "{\"appConfig\":{\"appName\":\"${EXTEND_APP_NAME}\"},\"customFunction\":{\"afterReadGameRecord\":true,\"beforeWritePlayerRecord\":true},\"extendType\":\"APP\"}" >/dev/null
+  api_curl -X POST -s "${AB_BASE_URL}/challenge/v1/admin/namespaces/$AB_NAMESPACE/plugins/assignment" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d "{\"appName\": \"${EXTEND_APP_NAME}\",\"extendType\": \"APP\"}" >/dev/null
 
   if [ "$(cat api_curl_http_code.out)" -ge "400" ]; then
+    cat api_curl_http_response.out
     exit 1
   fi
 else
@@ -74,27 +75,13 @@ fi
 
 echo Creating PLAYER ...
 
-USER_ID="$(api_curl -s "${AB_BASE_URL}/iam/v4/public/namespaces/$AB_NAMESPACE/users" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d "{\"authType\":\"EMAILPASSWD\",\"country\":\"ID\",\"dateOfBirth\":\"1995-01-10\",\"displayName\":\"Cloudsave gRPC Player\",\"uniqueDisplayName\":\"Cloudsave gRPC Player\",\"emailAddress\":\"${DEMO_PREFIX}_player@test.com\",\"password\":\"GFPPlmdb2-\",\"username\":\"${DEMO_PREFIX}_player\"}" | jq --raw-output .userId)"
+USER_ID="$(api_curl -s "${AB_BASE_URL}/iam/v4/public/namespaces/$AB_NAMESPACE/users" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d "{\"authType\":\"EMAILPASSWD\",\"country\":\"ID\",\"dateOfBirth\":\"1995-01-10\",\"displayName\":\"Challenge gRPC Player\",\"uniqueDisplayName\":\"Challenge gRPC Player\",\"emailAddress\":\"${DEMO_PREFIX}_player@test.com\",\"password\":\"GFPPlmdb2-\",\"username\":\"${DEMO_PREFIX}_player\"}" | jq --raw-output .userId)"
 
 if [ "$(cat api_curl_http_code.out)" -ge "400" ]; then
   cat api_curl_http_response.out
   exit 1
 fi
 
-echo Test BeforeWritePlayerRecord an VALID payload ... 
+# echo Test assigning user goals using custom assignment
+# TODO call get user's progression
 
-api_curl -X PUT -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/users/$USER_ID/records/favourite_weapon" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d '{"userId": "1e076bcee6d14c849ffb121c0e0135be", "favouriteWeaponType": "SWORD", "favouriteWeapon": "excalibur"}'
-echo
-
-if [ "$(cat api_curl_http_code.out)" -ge "400" ]; then
-  exit 1
-fi
-
-echo Test BeforeWritePlayerRecord an INVALID payload ... 
-
-api_curl -X PUT -s "${AB_BASE_URL}/cloudsave/v1/admin/namespaces/$AB_NAMESPACE/users/$USER_ID/records/favourite_weapon" -H "Authorization: Bearer $ACCESS_TOKEN" -H 'Content-Type: application/json' -d '{"foo":"bar"}' || true
-echo
-
-if [ "$(cat api_curl_http_code.out)" -lt "400" ]; then
-  exit 1
-fi

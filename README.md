@@ -19,7 +19,7 @@ instead of the default functions.
 ## Overview
 
 This repository serves as a template project for an `Extend Override` 
-app for `cloudsave validator` written in `Go`. You can clone this repository
+app for `challenge assignment function` written in `Go`. You can clone this repository
 and start implementing custom functions which can then be called by AGS.
 
 By using this repository as a template project, you will get the recommended 
@@ -186,71 +186,107 @@ The custom functions in this sample app can be tested locally using [postman](ht
 
    > :warning: **If you are running [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this sample app as mentioned in [Test Observability](#test-observability)**: Enter `localhost:10000` instead of `localhost:6565`. This way, the `gRPC server` will be called via `Envoy` service within `grpc-plugin-dependencies` stack instead of directly.
 
-3. Continue by selecting `CloudsaveValidatorService/BeforeWritePlayerRecord` method and invoke it with the sample message below.
+3. Continue by selecting `AssignmentFunction/Assign` method and invoke it with the sample message below.
 
    a. With a VALID `payload`
 
       ```json
       {
-          "createdAt": {
-              "nanos": 10,
-              "seconds": "1693468029"
-          },
-          "isPublic": true,
-          "key": "favourite_weapon",
-          "namespace": "mynamespace",
-          "payload": "eyJ1c2VySWQiOiAiMWUwNzZiY2VlNmQxNGM4NDlmZmIxMjFjMGUwMTM1YmUiLCAiZmF2b3VyaXRlV2VhcG9uVHlwZSI6ICJTV09SRCIsICJmYXZvdXJpdGVXZWFwb24iOiAiZXhjYWxpYnVyIn0=",  // {"userId": "1e076bcee6d14c849ffb121c0e0135be", "favouriteWeaponType": "SWORD", "favouriteWeapon": "excalibur"} encoded in base64
-          "setBy": "SERVER",
-          "updatedAt": {
-              "nanos": 10,
-              "seconds": "1693468275"
-          },
-          "userId": "1e076bcee6d14c849ffb121c0e0135be"
-      }
+         "goals": [
+            {
+                  "code": "goal-code",
+                  "challengeCode": "challenge-code",
+                  "name": "goal name",
+                  "isActive": true,
+                  "tags": [
+                     {
+                        "name": "big goal"
+                     }
+                  ],
+                  "requirements": [
+                     {
+                        "operator": "AND",
+                        "predicates": [
+                              {
+                                 "parameterName": "mmr",
+                                 "parameterType": "STATISTIC",
+                                 "matcher": "GREATER_THAN",
+                                 "targetValue": 100
+                              }
+                        ]
+                     }
+                  ],
+                  "rewards": [
+                     {
+                        "type": "STATISTIC",
+                        "itemId": "mmr",
+                        "itemName": "more mmr",
+                        "quantity": 10
+                     }
+                  ],
+                  "createdAt": {
+                     "seconds": "5095510",
+                     "nanos": 728418711
+                  },
+                  "updatedAt": {
+                     "seconds": "7873407235",
+                     "nanos": -217262300
+                  }
+            }
+         ],
+         "namespace": "namespace",
+         "userId": "dcd3fc9c238a4c6d9cd8c5da2f595bd6"
+   }  
       ```
 
-      The response will contain `isSuccess: true`
+      The response will be the list of goals chosen to be assigned to user
 
       ```json
       {
-          "isSuccess": true,
-          "key": "favourite_weapon",
-          "userId": "1e076bcee6d14c849ffb121c0e0135be"
-      }
-      ```
-
-   b. With an INVALID `payload`
-   
-      ```json
-      {
-          "createdAt": {
-              "nanos": 10,
-              "seconds": "1693468029"
-          },
-          "isPublic": true,
-          "key": "favourite_weapon",
-          "namespace": "mynamespace",
-          "payload": "eyJmb28iOiJiYXIifQ==",  // {"foo":"bar"} encoded in base64
-          "setBy": "SERVER",
-          "updatedAt": {
-              "nanos": 10,
-              "seconds": "1693468275"
-          },
-          "userId": "1e076bcee6d14c849ffb121c0e0135be"
-      }
-      ```
-
-      The response will contain `isSuccess: false`
-
-      ```json
-      {
-          "isSuccess": false,
-          "key": "favourite_weapon",
-          "userId": "1e076bcee6d14c849ffb121c0e0135be",
-          "error": {
-              "errorCode": 1,
-              "errorMessage": "favourite weapon cannot be empty;favourite weapon type cannot be empty;user ID cannot be empty"
-          }
+         "assignedGoals":  [
+            {
+                  "code": "goal-code",
+                  "challengeCode": "challenge-code",
+                  "name": "goal name",
+                  "isActive": true,
+                  "tags": [
+                     {
+                        "name": "big goal"
+                     }
+                  ],
+                  "requirements": [
+                     {
+                        "operator": "AND",
+                        "predicates": [
+                              {
+                                 "parameterName": "mmr",
+                                 "parameterType": "STATISTIC",
+                                 "matcher": "GREATER_THAN",
+                                 "targetValue": 100
+                              }
+                        ]
+                     }
+                  ],
+                  "rewards": [
+                     {
+                        "type": "STATISTIC",
+                        "itemId": "mmr",
+                        "itemName": "more mmr",
+                        "quantity": 10
+                     }
+                  ],
+                  "createdAt": {
+                     "seconds": "5095510",
+                     "nanos": 728418711
+                  },
+                  "updatedAt": {
+                     "seconds": "7873407235",
+                     "nanos": -217262300
+                  }
+            }
+         ],
+         "namespace": "namespace",
+         "userId": "dcd3fc9c238a4c6d9cd8c5da2f595bd6"
       }
       ```
 
@@ -281,21 +317,19 @@ public IP, we can use something like [ngrok](https://ngrok.com/).
 4. [Create an OAuth Client](https://docs.accelbyte.io/gaming-services/services/access/authorization/manage-access-control-for-applications/#create-an-iam-client) with `confidential` client type with the following permissions. Keep the `Client ID` and `Client Secret`.
    
    - For AGS Private Cloud customers:
-      - `ADMIN:NAMESPACE:{namespace}:CLOUDSAVE:PLUGINS [CREATE,READ,UPDATE,DELETE]`
-      - `ADMIN:NAMESPACE:{namespace}:USER:*:CLOUDSAVE:RECORD [CREATE,READ,UPDATE,DELETE]`
-      - `ADMIN:NAMESPACE:{namespace}:CLOUDSAVE:RECORD [CREATE,READ,UPDATE,DELETE]`
-      - `NAMESPACE:{namespace}:CLOUDSAVE:RECORD [CREATE,READ,UPDATE,DELETE]`
+      - `ADMIN:NAMESPACE:{namespace}:CHALLENGE:PLUGIN [CREATE,READ,UPDATE,DELETE]`
+      - `NAMESPACE:{namespace}:CHALLENGE:PROGRESSION [READ]`
       - `ADMIN:NAMESPACE:{namespace}:INFORMATION:USER:* [DELETE]`
+
    - For AGS Shared Cloud customers:
-      - Cloud Save -> Custom Configuration (Read, Create, Update, Delete)
-      - Cloud Save -> Game Records (Read, Create, Update, Delete)
-      - Cloud Save -> Player Records (Read, Create, Update, Delete)
+      - Challenge -> Custom Configuration (Read, Create, Update, Delete)
+      - Challenge -> Challenge Progression (Read, Create, Update, Delete)
       - IAM -> Users (Delete)
 
    > :warning: **Oauth Client created in this step is different from the one from Prerequisites section:** It is required 
    by [demo.sh](demo.sh) script in the next step to register the `gRPC Server` URL and also to create and delete test users.
 
-6. Run the [demo.sh](demo.sh) script to simulate cloudsave operation which calls this sample `gRPC server` using the `Client ID` 
+6. Run the [demo.sh](demo.sh) script to simulate challenge assignment which calls this sample `gRPC server` using the `Client ID` 
 and `Client Secret` created in the previous step. Pay attention to sample `gRPC server` console log when the script is running. 
 `gRPC Server` methods should get called.
 

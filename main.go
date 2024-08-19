@@ -50,7 +50,7 @@ const (
 )
 
 var (
-	serviceName = common.GetEnv("OTEL_SERVICE_NAME", "CustomCouldsaveValidatorServiceGoServerDocker")
+	serviceName = common.GetEnv("OTEL_SERVICE_NAME", "CustomChallengeAssignmentServiceGoServerDocker")
 	logLevelStr = common.GetEnv("LOG_LEVEL", logrus.InfoLevel.String())
 )
 
