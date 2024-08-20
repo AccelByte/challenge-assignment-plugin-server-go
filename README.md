@@ -28,7 +28,7 @@ some instrumentation for observability so that metrics, traces, and
 logs will be available when the app is deployed.
 
 As an example to get you started, this template project contains sample 
-custom functions for connecting this sample app onto challenge service to be used for challenge assignment.
+custom functions for connecting this app onto challenge service to be used for challenge assignment.
 
 ## Prerequisites
 
@@ -125,8 +125,7 @@ custom functions for connecting this sample app onto challenge service to be use
 
 ## Setup
 
-To be able to run the sample custom functions, you will need to follow these 
-setup steps.
+To be able to run this app, you will need to follow these setup steps.
 
 1. Create a docker compose `.env` file by copying the content of 
    [.env.template](.env.template) file.
@@ -147,13 +146,13 @@ setup steps.
    PLUGIN_GRPC_SERVER_AUTH_ENABLED=false     # Enable or disable access token validation
    ```
 
-   > :exclamation: **In this sample app, PLUGIN_GRPC_SERVER_AUTH_ENABLED is `true` by default**: If it is set to `false`, the 
+   > :exclamation: **In this app, PLUGIN_GRPC_SERVER_AUTH_ENABLED is `true` by default**: If it is set to `false`, the 
    `gRPC server` can be invoked without AGS access token. This option is provided for development 
    purpose only. It is recommended to enable `gRPC server` access token validation in production environment.
 
 ## Building
 
-To build this sample app, use the following command.
+To build this app, use the following command.
 
 ```
 make build
@@ -161,7 +160,7 @@ make build
 
 ## Running
 
-To (build and) run this sample app in a container, use the following command.
+To (build and) run this app in a container, use the following command.
 
 ```
 docker compose up --build
@@ -174,9 +173,9 @@ docker compose up --build
 > :warning: **To perform the following, make sure PLUGIN_GRPC_SERVER_AUTH_ENABLED is set to `false`**: Otherwise,
 the gRPC request will be rejected by the `gRPC server`.
 
-The custom functions in this sample app can be tested locally using [postman](https://www.postman.com/).
+The custom functions in this app can be tested locally using [postman](https://www.postman.com/).
 
-1. Run this `gRPC server` sample app by using the command below.
+1. Run this app by using the command below.
 
    ```shell
    docker compose up --build
@@ -184,7 +183,7 @@ The custom functions in this sample app can be tested locally using [postman](ht
 
 2. Open `postman`, create a new `gRPC request`, and enter `localhost:6565` as server URL (tutorial [here](https://blog.postman.com/postman-now-supports-grpc/)). 
 
-   > :warning: **If you are running [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this sample app as mentioned in [Test Observability](#test-observability)**: Enter `localhost:10000` instead of `localhost:6565`. This way, the `gRPC server` will be called via `Envoy` service within `grpc-plugin-dependencies` stack instead of directly.
+   > :warning: **If you are running [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this app as mentioned in [Test Observability](#test-observability)**: Enter `localhost:10000` instead of `localhost:6565`. This way, the `gRPC server` will be called via `Envoy` service within `grpc-plugin-dependencies` stack instead of directly.
 
 3. Continue by selecting `AssignmentFunction/Assign` method and invoke it with the sample message below.
 
@@ -292,11 +291,11 @@ The custom functions in this sample app can be tested locally using [postman](ht
 
 ### Test with AccelByte Gaming Services
 
-For testing this sample app which is running locally with AGS,
+For testing this app which is running locally with AGS,
 the `gRPC server` needs to be exposed to the internet. To do this without requiring 
 public IP, we can use something like [ngrok](https://ngrok.com/).
 
-1. Run this `gRPC server` sample app by using command below.
+1. Run this app by using command below.
 
    ```shell
    docker compose up --build
@@ -304,14 +303,14 @@ public IP, we can use something like [ngrok](https://ngrok.com/).
 
 2. Sign-in/sign-up to [ngrok](https://ngrok.com/) and get your auth token in `ngrok` dashboard.
 
-3. In this sample app root directory, run the following helper command to expose `gRPC server` port in local development environment to the internet. Take a note of the `ngrok` forwarding URL e.g. `http://0.tcp.ap.ngrok.io:xxxxx`.
+3. In this app root directory, run the following helper command to expose `gRPC server` port in local development environment to the internet. Take a note of the `ngrok` forwarding URL e.g. `http://0.tcp.ap.ngrok.io:xxxxx`.
 
    ```
    make ngrok NGROK_AUTHTOKEN=xxxxxxxxxxx
    ```
 
-   > :warning: **If you are running [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this sample app as mentioned in [Test Observability](#test-observability)**: Run the above 
-   command in `grpc-plugin-dependencies` directory instead of this sample app directory. 
+   > :warning: **If you are running [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this app as mentioned in [Test Observability](#test-observability)**: Run the above 
+   command in `grpc-plugin-dependencies` directory instead of this app directory. 
    This way, the `gRPC server` will be called via `Envoy` service within `grpc-plugin-dependencies` stack instead of directly.
 
 4. [Create an OAuth Client](https://docs.accelbyte.io/gaming-services/services/access/authorization/manage-access-control-for-applications/#create-an-iam-client) with `confidential` client type with the following permissions. Keep the `Client ID` and `Client Secret`.
@@ -329,9 +328,9 @@ public IP, we can use something like [ngrok](https://ngrok.com/).
    > :warning: **Oauth Client created in this step is different from the one from Prerequisites section:** It is required 
    by [demo.sh](demo.sh) script in the next step to register the `gRPC Server` URL and also to create and delete test users.
 
-6. Run the [demo.sh](demo.sh) script to simulate challenge assignment which calls this sample `gRPC server` using the `Client ID` 
-and `Client Secret` created in the previous step. Pay attention to sample `gRPC server` console log when the script is running. 
-`gRPC Server` methods should get called.
+5. Run the [demo.sh](demo.sh) script to simulate AGS operation which calls this app using the `Client ID` 
+and `Client Secret` created in the previous step. Pay attention this app log in the console when the script is running. 
+The custom functions should get called by AGS.
 
    ```
    export AB_BASE_URL='https://test.accelbyte.io'
@@ -349,7 +348,7 @@ and `Client Secret` created in the previous step. Pay attention to sample `gRPC 
 
 ### Test Observability
 
-To be able to see the how the observability works in this sample app locally, there are few things that need be setup before performing tests.
+To be able to see the how the observability works in this app locally, there are few things that need be setup before performing tests.
 
 1. Uncomment loki logging driver in [docker-compose.yaml](docker-compose.yaml)
 
@@ -364,11 +363,11 @@ To be able to see the how the observability works in this sample app locally, th
    ```
 
    > :warning: **Make sure to install docker loki plugin beforehand**: Otherwise,
-   this sample app will not be able to run. This is required so that container logs
+   this app will not be able to run. This is required so that container logs
    can flow to the `loki` service within `grpc-plugin-dependencies` stack. 
    Use this command to install docker loki plugin: `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`.
 
-2. Clone and run [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this sample app. After this, Grafana 
+2. Clone and run [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this app. After this, Grafana 
 will be accessible at http://localhost:3000.
 
    ```
@@ -398,7 +397,7 @@ After done testing, you may want to deploy this app to `AccelByte Gaming Service
    > :exclamation: For your convenience, the above `extend-helper-cli` command can also be 
    copied from `Repository Authentication Command` under the corresponding app detail page.
 
-4. Build and push sample app docker image to AccelByte ECR using the following command.
+4. Build and push this project docker image to AccelByte ECR using the following command.
    
    ```
    extend-helper-cli image-upload --work-dir <my-project-dir> --namespace <my-game> --app <my-app> --image-tag v0.0.1
