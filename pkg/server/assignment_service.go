@@ -22,6 +22,7 @@ func (server *AssignmentServiceServer) Assign(ctx context.Context, request *pb.A
 	goal := request.Goals[randomInt]
 
 	response.AssignedGoals = append(response.AssignedGoals, goal)
+	response.Namespace = request.Namespace
 
 	return &response, nil
 }

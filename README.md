@@ -28,7 +28,7 @@ some instrumentation for observability so that metrics, traces, and
 logs will be available when the app is deployed.
 
 As an example to get you started, this template project contains sample 
-custom functions for validating cloudsave payloads.
+custom functions for connecting this sample app onto challenge service to be used for challenge assignment.
 
 ## Prerequisites
 
