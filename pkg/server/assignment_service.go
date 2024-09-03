@@ -8,6 +8,9 @@ import (
 	pb "challenge-assignment-plugin-server-go/pkg/pb"
 	"context"
 	"math/rand"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AssignmentServiceServer struct {
@@ -18,6 +21,11 @@ func (server *AssignmentServiceServer) Assign(ctx context.Context, request *pb.A
 	response := pb.AssignmentResponse{}
 	response.UserId = request.UserId
 	response.AssignedGoals = make([]*pb.Goal, 0, 1)
+
+	if len(request.Goals) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "no active goals is available to be assigned")
+	}
+
 	randomInt := rand.Intn(len(request.Goals))
 	goal := request.Goals[randomInt]
 
