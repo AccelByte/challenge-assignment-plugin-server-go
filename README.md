@@ -159,7 +159,7 @@ custom functions for connecting this app onto challenge service to be used for c
 
    h. [ngrok](https://ngrok.com/)
 
-      - Follow [ngrok's installation guide](https://ngrok.com/download).
+      - Follow [ngrok's installation guide](https://ngrok.com/downloads).
 
    i. [extend-helper-cli](https://github.com/AccelByte/extend-helper-cli)
 
